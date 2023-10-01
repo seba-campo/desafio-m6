@@ -1,4 +1,5 @@
 type Jugada = "piedra" | "papel" | "tijera";
+
 type Game = {
   myPlay: Jugada;
   computerPlay: Jugada;
@@ -23,7 +24,7 @@ export const state = {
   },
   getState() {
     //   Retorna el JSON state en su última version del LOCAL
-    const currentState = localStorage.getItem("currentState");
+    const currentState = localStorage.getItem("currentState") as string;
 
     return JSON.parse(currentState);
   },
