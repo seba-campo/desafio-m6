@@ -15,36 +15,41 @@ class Welcome extends HTMLElement{
     const backgroundURL = require("url:../../img/fondo.svg");
   
     div.innerHTML = `
-          <div class="welcome-main-frame">
-              <div>
-                  <h1 class="page-title">Piedra Papel ó Tijera</h1>
+        <div class="welcome-main-frame">
+            <div>
+                <h1 class="page-title">Piedra Papel ó Tijera</h1>
+            </div>
+            <div class="button-div">
+              <div class="options-div">
+                <custom-button text="Nuevo juego" class="button create-game"></custom-button>
+                <custom-button text="Ingresar a una sala" class="button join-game"></custom-button>
               </div>
-              <div class="button-div">
-                <div class="options-div">
-                  <custom-button text="Nuevo juego" class="button create-game"></custom-button>
-                  <custom-button text="Ingresar a una sala" class="button join-game"></custom-button>
-                </div>
 
-                <div class="join-game-div">
-                  <input type="text" class="room-input"/>
-                  <custom-button text="Ingresar" class="button"></custom-button>
-                </div>
-
-                <div class="create-game-div">
-                  <input type="text" class="room-input"/>
-                  <custom-button text="Ingresar" class="button"></custom-button>
-                </div>
+              <div class="join-game-div">
+                <p class="label">Id de Sala</p>
+                <input type="text" class="room-input"/>
+                <custom-button text="Ingresar" class="button"></custom-button>
+                <custom-button text="Volver" class="button return"></custom-button>
               </div>
-              <div class="play-div">
+
+              <div class="create-game-div">
+                <p class="label">Tu nombre</p>
+                <input type="text" class="room-input"/>
+                <custom-button text="Ingresar" class="button"></custom-button>
+                <custom-button text="Volver" class="button return-a"></custom-button>
+              </div>
+            </div>
+            <div class="play-div">
+            
+                <play-selection selection="piedra" class="item"></play-selection>
+
+                <play-selection selection="papel" class="item"></play-selection>
+
+                <play-selection selection="tijera" class="item"></play-selection>
               
-                  <play-selection selection="piedra" class="item"></play-selection>
-  
-                  <play-selection selection="papel" class="item"></play-selection>
-  
-                  <play-selection selection="tijera" class="item"></play-selection>
-                
-              </div>
-          </div>
+            </div>
+        </div>
+
       `;
   
     style.textContent = `
@@ -80,18 +85,23 @@ class Welcome extends HTMLElement{
           }
 
           .room-input{
+            font-size: 15px;
+            width: 322px;
+            height: 37px;
+            margin: 15px 0;
           }
   
           .button-div{
             display: flex;
             flex-direction: column;
-            height: 200px; 
+            height: 350px; 
             justify-content: space-evenly;
+            align-items: center;
+            align-content: center;
           }
   
           .button{
-            margin: 5px 0;
-  
+            margin: 66px 0;
           }
   
           .play-div{
@@ -104,7 +114,7 @@ class Welcome extends HTMLElement{
               height: 145px;  
             }
           }
-  
+          
           .item{
             height: 200px;
             justify-self: flex-end;
@@ -119,6 +129,13 @@ class Welcome extends HTMLElement{
               height: 350px;
             }
           }
+          
+          .label{
+            font-size: 45px;
+            margin: 5px 0;
+            text-align: center;
+          }
+
       `;
   
     div.appendChild(style);
@@ -128,17 +145,34 @@ class Welcome extends HTMLElement{
     const joinGameDivEl = this.shadow.querySelector(".join-game-div") as HTMLElement;
     const optionsDivEl = this.shadow.querySelector(".options-div") as HTMLElement;
   
+    // CREAR ROOM
     const newGameButton = this.shadow.querySelector(".create-game") as HTMLElement;
     newGameButton?.addEventListener("click", () => {
       optionsDivEl.style.display = "none";
       createGameDivEl.style.display = "block";
-      // Router.go("/instructions")
     });
 
+    // ENTRAR A ROOM EXISTENTE
     const joinGameButton = this.shadow.querySelector(".join-game") as HTMLElement;
     joinGameButton?.addEventListener("click", ()=>{
       optionsDivEl.style.display = "none";
       joinGameDivEl.style.display = "block";
+    })
+
+
+    // HANDLERS DE BOTONES VOLVER
+    const returnButton = this.shadow.querySelector(".return") as HTMLElement;
+    returnButton.addEventListener("click", ()=>{
+      optionsDivEl.style.display = "block";
+      createGameDivEl.style.display = "none";
+      joinGameDivEl.style.display = "none";
+    })
+
+    const returnButtonA = this.shadow.querySelector(".return-a") as HTMLElement;
+    returnButtonA.addEventListener("click", ()=>{
+      optionsDivEl.style.display = "block";
+      createGameDivEl.style.display = "none";
+      joinGameDivEl.style.display = "none";
     })
   }
 }

@@ -1,5 +1,6 @@
 // Pages
 import "./pages/welcome"
+import "./pages/game-room"
 import "./router"
 // Components
 import { playElement } from "./components/jugada";

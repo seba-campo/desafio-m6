@@ -5,5 +5,5 @@ const router = new Router(root);
 
 router.setRoutes([
   {path: '/', component: 'welcome-page'},
-  {path: '/users', component: 'x-user-list'}
+  {path: '/game-room', component: 'game-room-page'}
 ]);
