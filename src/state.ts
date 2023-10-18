@@ -6,32 +6,47 @@ type Game = {
 };
 
 export const state = {
-  // data: {
-  //   currentGame: {
-  //     myPlay: "",
-  //     computerPlay: "",
-  //   },
-  //   history: [{ myPlay: "tijera", computerPlay: "tijera" }],
-  //   results: {
-  //     computer: 0,
-  //     player: 0,
-  //   },
-  // },
+  data: {
+    localPlayer: "Seba",
+    opponent: "Martin",
+    roomId: "FGAS",
+    currentGame: {
+      myPlay: "",
+      computerPlay: "",
+    },
+    history: [{ myPlay: "tijera", computerPlay: "tijera" },{ myPlay: "piedra", computerPlay: "tijera" },{ myPlay: "tijera", computerPlay: "papel" },{ myPlay: "tijera", computerPlay: "papel" }],
+    scoreBoard: {
+      localPlayer : 0,
+      opponent: 0
+    }
+  },
   listeners: [],
   subscribe(callback: (any) => any) {
     // recibe callbacks para ser avisados posteriormente
     this.listeners.push(callback);
   },
   getState() {
-    //   Retorna el JSON state en su última version del LOCAL
-    const currentState = localStorage.getItem("currentState") as string;
-
-    return JSON.parse(currentState);
+    return this.data;
   },
   setState(newState) {
-    localStorage.setItem("currentState", JSON.stringify(newState));
+    this.data == newState;
+    for(var cb of this.listeners){
+      cb();
+    }
   },
-  setMove(move: Jugada) {
+  setNombre(nombre : string){
+    const cs = this.getState();
+    cs.nombre == nombre;
+
+    this.setState(cs);
+  },
+  setRoomId(roomId : string){
+    const cs = this.getState();
+    cs.roomId == roomId;
+
+    this.setState(cs);
+  }, 
+  setMove(move : Jugada) {
     const currentState = this.getState();
 
     // Agrego ambas jugadas al currentState
@@ -49,32 +64,38 @@ export const state = {
       cb(currentState);
     }
   },
-  whoWins(myPlay: Jugada, computerPlay: Jugada) {
-    const ganeConTijeras = myPlay == "tijera" && computerPlay == "papel";
-    const ganeConPapel = myPlay == "papel" && computerPlay == "piedra";
-    const ganeConPiedra = myPlay == "piedra" && computerPlay == "tijera";
+  whoWins(localPlay: Jugada, opponentPlay: Jugada) {
+    const cs = this.getState();
 
-    const playerWins = [ganeConTijeras, ganeConPiedra, ganeConPapel].includes(
+    const playerGanoConTijeras = localPlay == "tijera" && opponentPlay == "papel";
+    const playerGanoConPapel = localPlay == "papel" && opponentPlay == "piedra";
+    const playerGanoConPiedra = localPlay == "piedra" && opponentPlay == "tijera";
+
+    const playerWins = [playerGanoConTijeras, playerGanoConPiedra, playerGanoConPapel].includes(
       true
     );
 
-    const computerGanoTijeras = computerPlay == "tijera" && myPlay == "papel";
-    const computerGanoPapel = computerPlay == "papel" && myPlay == "piedra";
-    const computerGanoPiedra = computerPlay == "piedra" && myPlay == "tijera";
+    const opponentGanoTijeras = opponentPlay == "tijera" && localPlay == "papel";
+    const opponentGanoPapel = opponentPlay == "papel" && localPlay == "piedra";
+    const opponentGanoPiedra = opponentPlay == "piedra" && localPlay == "tijera";
 
-    const computerWins = [
-      computerGanoTijeras,
-      computerGanoPapel,
-      computerGanoPiedra,
+    const opponentWins = [
+      opponentGanoTijeras,
+      opponentGanoPapel,
+      opponentGanoPiedra,
     ].includes(true);
 
     if (playerWins) {
+      cs.scoreBoard.localPlayer ++
+      this.setState();
       return true;
     }
-    if (computerWins) {
+    if (opponentWins) {
+      cs.scoreBoard.opponent ++
+      this.setState();
       return false;
     }
-    if (!playerWins && !computerWins) {
+    if (!playerWins && !opponentWins) {
       return null;
     }
   },

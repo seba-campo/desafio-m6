@@ -1,3 +1,5 @@
+import { state } from "../../state";
+
 class GameRoom extends HTMLElement{
   shadow = this.attachShadow({mode: "open"})
   constructor(){
@@ -9,37 +11,45 @@ class GameRoom extends HTMLElement{
   const style = document.createElement("style");
   const backgroundURL = require("url:../../img/fondo.svg");
 
-  const roomId = "43DHJ32"
+  const currentState = state.getState();
+
+
+  const roomId = currentState.roomId;
+
+  const actualPlayer = currentState.localPlayer;
+  const opponent = currentState.opponent;
+
 
   initialDiv.innerHTML = `
           <div class="game-room">
-            <div class="header">
-                <div class="header__score">
-                  <p class="score"> Marece: 0</p>
-                  <p class="score"> Paula: 0</p>
-                </div>
+            <div class="wrapper">
+              <div class="header">
+                  <div class="header__score">
+                    <p class="score">${actualPlayer}: ${currentState.scoreBoard.localPlayer}</p>
+                    <p class="score">${opponent}: ${currentState.scoreBoard.opponent}</p>
+                  </div>
 
-                <div class="header__room-id">
-                  <p class="room-id"><strong>Sala: </strong><br>${roomId}</p>
-                </div>
+                  <div class="header__room-id">
+                    <p class="room-id"><strong>Sala: </strong><br>${roomId}</p>
+                  </div>
+              </div>
+
+              <div class="code-share">
+                <p class="p-code">Compartí el código: <strong><br>${roomId}</strong> <br> Con tu contrincante </p>
+              </div>
+
+
+              <div class="game-ready">
+                <p class="game-ready-p">Presioná jugar y elegí: piedra, papel o tijera antes de que pasen los 3 segundos. </p>
+                <custom-button text="¡Jugar!" class="play"></custom-button>
+              </div>
+
+
+
+              <div class="waiting-player">
+                <p class="waiting-player-p">Esperando a que <strong>Paula</strong> presione Jugar...</p>
+              </div>         
             </div>
-
-            <div class="code-share">
-              <p class="p-code">Compartí el código: <strong><br>${roomId}</strong> <br> Con tu contrincante </p>
-            </div>
-
-
-            <div class="game-ready">
-              <p class="game-ready-p">Presioná jugar y elegí: piedra, papel o tijera antes de que pasen los 3 segundos. </p>
-              <custom-button text="¡Jugar!" class="play"></custom-button>
-            </div>
-
-
-
-            <div class="waiting-player">
-              <p class="waiting-player-p">Esperando a que <strong>Paula</strong> presione Jugar...</p>
-            </div>         
-            
             <div class="play-div">
                 <play-selection class="item" selection="piedra"></play-selection>
                 <play-selection class="item" selection="papel"></play-selection>
@@ -57,6 +67,13 @@ class GameRoom extends HTMLElement{
           justify-content: space-around;
           align-items: center;
           height: 100vh;
+      }
+
+      .wrapper{
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
       }
 
       .header{
@@ -135,6 +152,7 @@ class GameRoom extends HTMLElement{
           height: 145px;  
         }
       }
+      
       .item{
         height: 200px;
         justify-self: flex-end;
