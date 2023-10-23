@@ -5,15 +5,15 @@ type Game = {
   computerPlay: Jugada;
 };
 
+const API_URL = "http://localhost:3000";
+
 export const state = {
   data: {
     localPlayer: "Seba",
     opponent: "Martin",
     roomId: "FGAS",
-    currentGame: {
-      myPlay: "",
-      computerPlay: "",
-    },
+    nombre: "",
+    localPlayerId: "",
     history: [{ myPlay: "tijera", computerPlay: "tijera" },{ myPlay: "piedra", computerPlay: "tijera" },{ myPlay: "tijera", computerPlay: "papel" },{ myPlay: "tijera", computerPlay: "papel" }],
     scoreBoard: {
       localPlayer : 0,
@@ -21,6 +21,41 @@ export const state = {
     }
   },
   listeners: [],
+  registerUser(callback){
+    const cs  = this.getState();
+
+    return fetch(API_URL+"/signup",{
+      method: "post",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({nombre: cs.nombre})
+    }).then(res => {
+        return res.json()
+    }).then((data => {
+      this.setLocalPlayerId(data.id)
+      callback();
+    }))
+  },
+  login(callback){
+    const cs = this.getState();
+
+    return fetch(API_URL+"/login", {
+      method: "post",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({nombre: cs.nombre})
+    }).then(res => {
+      if(res.status == 200){
+        return res.json();
+      } else {
+        console.log("User not found, registering...");
+        this.registerUser(()=>{
+          console.log("User registered successfully")
+        })
+      }
+    }).then((data => {
+      this.setLocalPlayerId(data.id)
+      callback();
+    }))
+  },
   subscribe(callback: (any) => any) {
     // recibe callbacks para ser avisados posteriormente
     this.listeners.push(callback);
@@ -34,8 +69,15 @@ export const state = {
       cb();
     }
   },
+  setLocalPlayerId(id: string){
+    const cs = this.getState();
+    cs.localPlayerId == id;
+
+    this.setState(cs);
+  },
   setNombre(nombre : string){
     const cs = this.getState();
+    cs.localPlayer == nombre;
     cs.nombre == nombre;
 
     this.setState(cs);
