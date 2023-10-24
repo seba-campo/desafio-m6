@@ -38,6 +38,13 @@ class Welcome extends HTMLElement{
                 <custom-button text="Ingresar" class="button button button-set-name"></custom-button>
                 <custom-button text="Volver" class="button return-a"></custom-button>
               </div>
+
+              <div class="set-name-div">
+                <p class="label">Tu nombre</p>
+                <input type="text" class="room-input" id="name-input-create-game"/>
+                <custom-button text="Ingresar" class="button-confirm-set-name"></custom-button>
+                <custom-button text="Volver" class="button return-a"></custom-button>
+              </div>
             </div>
             <div class="play-div">
             
@@ -81,6 +88,10 @@ class Welcome extends HTMLElement{
           }
           
           .create-game-div{
+            display: none;
+          }
+
+          .set-name-div{
             display: none;
           }
 
@@ -147,28 +158,36 @@ class Welcome extends HTMLElement{
     const createGameDivEl = this.shadow.querySelector(".create-game-div") as HTMLElement;
     const joinGameDivEl = this.shadow.querySelector(".join-game-div") as HTMLElement;
     const optionsDivEl = this.shadow.querySelector(".options-div") as HTMLElement;
+    const setNameDivEl = this.shadow.querySelector(".set-name-div") as HTMLElement;
   
-    // CREAR ROOM (pide nombre)
+    // NEW GAME (pide nombre)
     const newGameButton = this.shadow.querySelector(".create-game") as HTMLElement;
     newGameButton?.addEventListener("click", () => {
       optionsDivEl.style.display = "none";
       createGameDivEl.style.display = "block";
     });
 
-    // CREAR ROOM CONFIRM (pide nombre)
+    // NEW GAME CONFIRM (pide nombre)
     const createNewRoomConfirm = this.shadow.querySelector(".button-set-name") as HTMLElement;
     createNewRoomConfirm?.addEventListener("click", ()=>{
       const nameInput = this.shadow.querySelector("#name-input-create-game") as HTMLInputElement
       if(nameInput.value.length >= 4){
         console.log("Asignado el nombre ", nameInput.value);
         state.setNombre(nameInput.value);
-        
-        Router.go("/game-room")
-        
-        // TODO fetch user y crear sala
+
       }else{
         alert("Nombre inválido, o de menos de 4 caracteres");
       }
+      // TODO fetch user y crear sala
+      state.login(()=>{
+        // Creo la sala
+        state.createRoom(()=>{
+          // Me conecto a la sala
+          state.connectToRoom(()=>{
+            Router.go("/game-room")
+          })
+        });
+      });
     });
 
 
@@ -182,18 +201,29 @@ class Welcome extends HTMLElement{
     const joinGameConfirm = this.shadow.querySelector(".button-set-roomid") as HTMLElement;
     joinGameConfirm.addEventListener("click", ()=>{
       const roomIdInput = this.shadow.querySelector("#roomid-input") as HTMLInputElement
-      if(roomIdInput.value.length == 4){
+      if(roomIdInput.value.length == 6){
+
         console.log("Asignado el room id ", roomIdInput.value.toUpperCase());
         state.setRoomId(roomIdInput.value.toUpperCase());
 
         // Luego de colocar el ID de la sala, pide el nombre de quien entra:
         optionsDivEl.style.display = "none";
         joinGameDivEl.style.display = "none";
-        createGameDivEl.style.display = "block";
+        createGameDivEl.style.display = "none";
+        setNameDivEl.style.display = "block";
 
-        Router.go("/game-room")
+        const setNameButton = this.shadow.querySelector(".button-confirm-set-name");
+        setNameButton?.addEventListener("click", ()=>{
+          // Logeo el user
+          state.login(()=>{
+            //Me conecto a la sala
+            state.connectToRoom(()=>{
+              Router.go("/game-room")
+            })
+          })
+        })
 
-        // TODO: fetch verificacion de user y conexion a sala
+
       }else{
         alert("El ID debe tener 4 caracteres");
       }

@@ -16,8 +16,10 @@ class GameRoom extends HTMLElement{
 
   const roomId = currentState.roomId;
 
-  const actualPlayer = currentState.localPlayer;
+  const actualPlayer = currentState.localPlayerName;
   const opponent = currentState.opponent;
+
+  console.log(currentState)
 
 
   initialDiv.innerHTML = `
@@ -170,7 +172,7 @@ class GameRoom extends HTMLElement{
   `;
 
   initialDiv.appendChild(style);
-  this.shadow.appendChild(initialDiv)
+  this.shadow.appendChild(initialDiv);
 }
 }
 
