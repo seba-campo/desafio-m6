@@ -41,7 +41,7 @@ class Welcome extends HTMLElement{
 
               <div class="set-name-div">
                 <p class="label">Tu nombre</p>
-                <input type="text" class="room-input" id="name-input-create-game"/>
+                <input type="text" class="room-input" id="name-input-create-game2"/>
                 <custom-button text="Ingresar" class="button-confirm-set-name"></custom-button>
                 <custom-button text="Volver" class="button return-a"></custom-button>
               </div>
@@ -202,18 +202,24 @@ class Welcome extends HTMLElement{
     joinGameConfirm.addEventListener("click", ()=>{
       const roomIdInput = this.shadow.querySelector("#roomid-input") as HTMLInputElement
       if(roomIdInput.value.length == 6){
-
-        console.log("Asignado el room id ", roomIdInput.value.toUpperCase());
+        
         state.setRoomId(roomIdInput.value.toUpperCase());
-
+        
         // Luego de colocar el ID de la sala, pide el nombre de quien entra:
         optionsDivEl.style.display = "none";
         joinGameDivEl.style.display = "none";
         createGameDivEl.style.display = "none";
         setNameDivEl.style.display = "block";
-
+        
         const setNameButton = this.shadow.querySelector(".button-confirm-set-name");
         setNameButton?.addEventListener("click", ()=>{
+          const nameInput = this.shadow.querySelector("#name-input-create-game2") as HTMLInputElement
+          
+          console.log("Nombre a setear", nameInput.value)
+          state.setNombre(nameInput.value);
+
+          console.log(state.getState());
+
           // Logeo el user
           state.login(()=>{
             //Me conecto a la sala

@@ -64,16 +64,17 @@ export const state = {
     }).then(res => {
       if(res.status == 200){
         return res.json();
-      } else {
+      } 
+      if(res.status == 404) {
         console.log("User not found, registering...");
         return this.registerUser(()=>{
           console.log("User registered successfully")
         })
       }
     }).then((data => {
-      this.setLocalPlayerId(data.id);
-      callback();
-    }))
+        this.setLocalPlayerId(data.id);
+        callback();
+      }))
   },
   // CREAR SALA
   createRoom(callback){
@@ -98,7 +99,17 @@ export const state = {
       method: "GET",
       headers: {"content-type": "application/json"}
     }).then(res => {
-      return res.json()
+      if(res.status == 200){
+        return res.json()
+      }
+      if(res.status == 409){
+        console.log("The Room is Full")
+        //Hago un prevent del callback (ya que se usa para enrutar con la siguiente pagina)
+        callback = ()=>{
+
+        }
+        return cs.roomData;
+      }
     }).then(data => {
       this.setRoomData(data)
       
