@@ -1,11 +1,27 @@
+import { read } from "fs";
 import { state } from "../../state";
+import { Router } from "@vaadin/router";
 
 class GameRoom extends HTMLElement{
   shadow = this.attachShadow({mode: "open"})
   constructor(){
     super();
     this.render();
-  }  
+  }
+  connectedCallback(){
+    const currenState = state.getState();
+    state.subscribe((currentState)=>{
+        const opponentReady = currentState.realTimeRoom.participants.owner.isReady;
+        const ownerReady = currentState.realTimeRoom.participants.opponent.isReady;
+
+        if(opponentReady && ownerReady){
+          // state.setUnReadyStatus();
+          state.updateRtdb(()=>{
+            Router.go("/play")
+          })
+        }
+    })
+  }
   render(){
   const initialDiv = document.createElement("div");
   const style = document.createElement("style");
@@ -17,9 +33,12 @@ class GameRoom extends HTMLElement{
   const roomId = currentState.roomId;
 
   const actualPlayer = currentState.localPlayerName;
-  const opponent = currentState.opponent;
+  var opponent = currentState.opponent;
 
-  console.log(currentState)
+  if(opponent == undefined || currentState.scoreBoard.opponent == undefined){
+    currentState.scoreBoard.opponent = 0;
+    opponent = "Waiting user..."
+  }
 
 
   initialDiv.innerHTML = `
@@ -36,20 +55,15 @@ class GameRoom extends HTMLElement{
                   </div>
               </div>
 
-              <div class="code-share">
-                <p class="p-code">Compartí el código: <strong><br>${roomId}</strong> <br> Con tu contrincante </p>
-              </div>
-
 
               <div class="game-ready">
                 <p class="game-ready-p">Presioná jugar y elegí: piedra, papel o tijera antes de que pasen los 3 segundos. </p>
-                <custom-button text="¡Jugar!" class="play"></custom-button>
+                <custom-button text="¡Jugar!" class="ready-button"></custom-button>
               </div>
 
 
-
               <div class="waiting-player">
-                <p class="waiting-player-p">Esperando a que <strong>Paula</strong> presione Jugar...</p>
+                <p class="waiting-player-p">Esperando a que <strong>${opponent}</strong> presione Jugar...</p>
               </div>         
             </div>
             <div class="play-div">
@@ -58,7 +72,8 @@ class GameRoom extends HTMLElement{
                 <play-selection class="item" selection="tijera"></play-selection>
             </div>
           </div>
-      `;
+      `
+    ;
 
   style.textContent = `
       .game-room{
@@ -125,9 +140,9 @@ class GameRoom extends HTMLElement{
       }
 
       .game-ready{
-        width: 360px;
-        display: none;
+        display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
       }
       .game-ready-p{
@@ -136,7 +151,6 @@ class GameRoom extends HTMLElement{
       }
 
       .waiting-player{
-        width: 360px;
         display: none;
       }
       .waiting-player-p{
@@ -170,6 +184,25 @@ class GameRoom extends HTMLElement{
         }
       }
   `;
+
+  const readyButtonEl = initialDiv.querySelector(".ready-button");
+  const readyContainerEl = initialDiv. querySelector(".game-ready") as HTMLDivElement;
+  const waitingPlayerEl = initialDiv.querySelector(".waiting-player") as HTMLDivElement;
+
+
+  readyButtonEl?.addEventListener("click", ()=>{
+    readyContainerEl.style.display = "none";
+    waitingPlayerEl.style.display = "block";
+
+    const cs = state.getState();
+
+    // Le seteo estado de ready
+    state.setPlayerReadyStatus(cs.localPlayerName);
+    state.updateRtdb(()=>{
+      console.log("RTDB actualizada")
+    })
+
+  });
 
   initialDiv.appendChild(style);
   this.shadow.appendChild(initialDiv);

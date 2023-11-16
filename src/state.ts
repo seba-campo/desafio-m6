@@ -1,3 +1,5 @@
+import { rtdb } from "./rtdb"
+
 type Jugada = "piedra" | "papel" | "tijera";
 
 type Game = {
@@ -23,9 +25,24 @@ export const state = {
         opponent:{
           nombre: "",
           id: "",
-        }  
+        }
       },
       isFull: Boolean,
+    },
+    realTimeRoom: {
+      owner: "",
+      participants: {
+          owner: {
+              nombre: "",
+              isConnected: true,
+              isReady: false,
+          },
+          opponent: {
+              nombre: "",
+              isConnected: true,
+              isReady: false,
+          }
+      }
     },
     history: [{ myPlay: "tijera", computerPlay: "tijera" },{ myPlay: "piedra", computerPlay: "tijera" },{ myPlay: "tijera", computerPlay: "papel" },{ myPlay: "tijera", computerPlay: "papel" }],
     scoreBoard: {
@@ -124,8 +141,29 @@ export const state = {
       }
 
       callback();
-
     })
+  },
+  // INGRESAR A LA RTDB
+  sablishRoomConnection(callback){
+    const cs = this.getState();
+    const chatroomRef = rtdb.ref("/rooms/" + cs.roomData.privateKey);
+
+    chatroomRef.on("value", (snapshot) => {
+        const rtdbSnap = snapshot.val(); 
+        console.log(rtdbSnap)
+        this.setRealTimeRoomData(rtdbSnap);
+    });
+
+    callback();
+  },
+  // ESCRIBIR EN LA RTDB
+  updateRtdb(callback){
+    const cs = this.getState();
+    const chatroomRef = rtdb.ref("/rooms/" + cs.roomData.privateKey);
+
+    chatroomRef.update(cs.realTimeRoom)
+
+    callback();
   },
 
 
@@ -135,10 +173,38 @@ export const state = {
     return this.data;
   },
   setState(newState) {
+    const cs = this.getState();
     this.data = newState;
     for(var cb of this.listeners){
-      cb();
+      cb(cs);
     }
+  },
+  setUnReadyStatus(){
+    const cs = this.getState();
+    cs.realTimeRoom.participants.owner.isReady = false
+    cs.realTimeRoom.participants.opponent.isReady = false
+
+    this.setState(cs);
+  },
+  setPlayerReadyStatus(userName: string){
+    const cs = this.getState();
+    switch(userName){
+      case cs.realTimeRoom.participants.owner.nombre:
+          cs.realTimeRoom.participants.owner.isReady = true
+          this.setState(cs);
+        break
+
+      case cs.realTimeRoom.participants.opponent.nombre:
+          cs.realTimeRoom.participants.opponent.isReady = true
+          this.setState(cs);
+        break
+      }
+  },
+  setRealTimeRoomData(data: any){
+    const cs = this.getState();
+    cs.realTimeRoom = data;
+
+    this.setState(cs);
   },
   setRoomId(roomId: string){
     const cs = this.getState();

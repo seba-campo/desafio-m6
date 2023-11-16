@@ -180,11 +180,18 @@ class Welcome extends HTMLElement{
       }
       // TODO fetch user y crear sala
       state.login(()=>{
+        console.log("User logged in...")
         // Creo la sala
         state.createRoom(()=>{
+          console.log("Room created")
           // Me conecto a la sala
           state.connectToRoom(()=>{
-            Router.go("/game-room")
+            console.log("Connected to Room")
+            // Arranco la RTDB
+            state.sablishRoomConnection(()=>{
+              console.log("Room started")
+              Router.go("/game-room")
+            })
           })
         });
       });
@@ -214,17 +221,22 @@ class Welcome extends HTMLElement{
         const setNameButton = this.shadow.querySelector(".button-confirm-set-name");
         setNameButton?.addEventListener("click", ()=>{
           const nameInput = this.shadow.querySelector("#name-input-create-game2") as HTMLInputElement
-          
-          console.log("Nombre a setear", nameInput.value)
+
           state.setNombre(nameInput.value);
 
           console.log(state.getState());
 
           // Logeo el user
           state.login(()=>{
+            console.log("User Logged in...")
             //Me conecto a la sala
             state.connectToRoom(()=>{
-              Router.go("/game-room")
+              console.log("Connected to Room")
+              // Arranco la RTDB
+              state.sablishRoomConnection(()=>{
+                console.log("Room started")
+                Router.go("/game-room")
+              })
             })
           })
         })
