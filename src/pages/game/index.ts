@@ -1,34 +1,35 @@
 import { state } from "../../state";
 
-class Play extends HTMLElement{
+class PlayPage extends HTMLElement{
   shadow = this.attachShadow({mode: "open"})
   constructor(){
-  super();
-  this.render();
+    super();
+    this.render();
   }
   render(){
     const initialDiv = document.createElement("div");
     const style = document.createElement("style");
     const backgroundURL = require("url:../../img/fondo.svg");
-    const path = location.pathname;
   
     const initLocalState = state.getState();
   
-    //Si no existe state en el storage lo inicializo
-    if (initLocalState == undefined || initLocalState == null) {
-      const initialState = {
-        currentGame: { myPlay: "undefined", computerPlay: "undefined" },
-        history: [],
-        points: {
-          computer: 0,
-          player: 0,
-        },
-      };
-      console.log("inicializado el state");
-  
-      state.setState(initialState);
-    }
-  
+    initialDiv.innerHTML = `
+      <div class="playground-div">
+        <div class="opponent-play">
+
+        </div>
+      <div>
+          <timer-el></timer-el>
+      </div>
+
+      <div class="play-div">
+          <play-selection selection="piedra" class="disabled" id="piedra"></play-selection>
+          <play-selection selection="papel" class="disabled" id="papel"></play-selection>
+          <play-selection selection="tijera" class="disabled" id="tijera"></play-selection>
+      </div>
+    </div>
+    `;
+
     style.textContent = `
         .playground-div{
           font-family: var(--main-font);
@@ -87,23 +88,23 @@ class Play extends HTMLElement{
         }
       }
   
-      .computer-play{
+      .opponent-play{
         transform: rotate(180deg);
         position: relative;
         top: -20px;
       }
       @media(min-width: 530px){
-        .computer-play{
+        .opponent-play{
           top: -120px;
         }
       }
       @media(min-width: 768px){
-        .computer-play{
+        .opponent-play{
           top: 40px;
         }
       }
       @media(min-width: 1650px){
-        .computer-play{
+        .opponent-play{
           top: -80px;
         }
       }
@@ -120,26 +121,7 @@ class Play extends HTMLElement{
         display: none;
       }
     `;
-  
-    // <play-selection selection="${}" class="off enabled" id="computer-play"></play-selection>
-  
-    initialDiv.innerHTML = `
-        <div class="playground-div">
-          <div class="computer-play">
-  
-          </div>
-        <div>
-            <timer-el></timer-el>
-        </div>
-  
-        <div class="play-div">
-            <play-selection selection="piedra" class="disabled" id="piedra"></play-selection>
-            <play-selection selection="papel" class="disabled" id="papel"></play-selection>
-            <play-selection selection="tijera" class="disabled" id="tijera"></play-selection>
-        </div>
-      </div>
-    `;
-  
+    
     const piedraEl = initialDiv.querySelector("#piedra");
     const papelEl = initialDiv.querySelector("#papel");
     const tijeraEl = initialDiv.querySelector("#tijera");
@@ -165,11 +147,11 @@ class Play extends HTMLElement{
       const papelClicked = papelEl?.classList.contains("disabled");
       const piedraClicked = piedraEl?.classList.contains("disabled");
   
-      console.log("Hola");
       if (tijeraClicked && papelClicked && piedraClicked) {
         //Se usa location.reload, ya que si se usa el goTo, entra en bucle.
         clearInterval(timeToPlay);
-        location.reload();
+        console.log("NO HAS JUGADO NADA")
+        // location.reload();
       }
       clearInterval(timeToPlay);
     }, 3100);
@@ -180,17 +162,17 @@ class Play extends HTMLElement{
       const tijeraEl = initialDiv.querySelector("#tijera");
   
       if (piedraEl?.classList.contains("enabled")) {
-        state.setMove("piedra");
+        state.setActualPlay("piedra");
         papelEl?.classList.add("off");
         tijeraEl?.classList.add("off");
       }
       if (papelEl?.classList.contains("enabled")) {
-        state.setMove("papel");
+        state.setActualPlay("papel");
         tijeraEl?.classList.add("off");
         piedraEl?.classList.add("off");
       }
       if (tijeraEl?.classList.contains("enabled")) {
-        state.setMove("tijera");
+        state.setActualPlay("tijera");
         papelEl?.classList.add("off");
         piedraEl?.classList.add("off");
       }
@@ -198,20 +180,20 @@ class Play extends HTMLElement{
       clearInterval(showPlay);
     }, 5000);
   
-    const showComputerPlay = setInterval(() => {
-      const cs = state.getState();
+    // const showComputerPlay = setInterval(() => {
+    //   const cs = state.getState();
   
-      var computerChoice = cs.currentGame.computerPlay;
+    //   var computerChoice = cs.currentGame.computerPlay;
   
-      const playSelectionEl = `
-        <play-selection selection="${computerChoice}" class="on" id="computer-play"></play-selection>
-      `;
+    //   const playSelectionEl = `
+    //     <play-selection selection="${computerChoice}" class="on" id="opponent-play"></play-selection>
+    //   `;
   
-      const computerPlayEl = initialDiv.querySelector(".computer-play") as HTMLElement;
-      computerPlayEl.innerHTML = playSelectionEl;
+    //   const computerPlayEl = initialDiv.querySelector(".opponent-play") as HTMLElement;
+    //   computerPlayEl.innerHTML = playSelectionEl;
   
-      clearInterval(showComputerPlay);
-    }, 5050);
+    //   clearInterval(showComputerPlay);
+    // }, 5050);
   
   
     initialDiv.appendChild(style);
@@ -219,4 +201,4 @@ class Play extends HTMLElement{
   }
 }
 
-customElements.define("play-page", Play)
+customElements.define("play-page", PlayPage)

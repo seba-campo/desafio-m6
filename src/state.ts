@@ -35,16 +35,21 @@ export const state = {
           owner: {
               nombre: "",
               isConnected: true,
-              isReady: false,
           },
           opponent: {
               nombre: "",
               isConnected: true,
-              isReady: false,
           }
+      },
+      sessionPlays: {
+          actual: {
+            owner: "",
+            opponent: "",
+          },
+          thisSession: []
       }
     },
-    history: [{ myPlay: "tijera", computerPlay: "tijera" },{ myPlay: "piedra", computerPlay: "tijera" },{ myPlay: "tijera", computerPlay: "papel" },{ myPlay: "tijera", computerPlay: "papel" }],
+    // history: [{ myPlay: "tijera", computerPlay: "tijera" },{ myPlay: "piedra", computerPlay: "tijera" },{ myPlay: "tijera", computerPlay: "papel" },{ myPlay: "tijera", computerPlay: "papel" }],
     scoreBoard: {
       localPlayerName : 0,
       opponent: 0
@@ -177,6 +182,21 @@ export const state = {
     this.data = newState;
     for(var cb of this.listeners){
       cb(cs);
+    }
+    console.log("STATE", newState)
+  },
+  setActualPlay(play: Jugada){
+    const cs = this.getState();
+    switch(cs.localPlayerName){
+      case cs.realTimeRoom.participants.owner.nombre:
+          cs.realTimeRoom.sessionPlays.actual.owner = play
+          this.setState(cs);
+        break
+
+      case cs.realTimeRoom.participants.opponent.nombre:
+          cs.realTimeRoom.sessionPlays.actual.opponent = play
+          this.setState(cs);
+        break
     }
   },
   setUnReadyStatus(){

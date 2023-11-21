@@ -1,4 +1,3 @@
-import { read } from "fs";
 import { state } from "../../state";
 import { Router } from "@vaadin/router";
 
@@ -17,7 +16,7 @@ class GameRoom extends HTMLElement{
         if(opponentReady && ownerReady){
           // state.setUnReadyStatus();
           state.updateRtdb(()=>{
-            Router.go("/play")
+            Router.go("/game")
           })
         }
     })
