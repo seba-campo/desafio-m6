@@ -23,9 +23,7 @@ export function scoreEl() {
 
       var imgURL = "";
 
-      const playerScore = this.getAttribute("player-score");
-      const computerScore = this.getAttribute("computer-score");
-
+      
       if (JSON.parse(won)) {
         imgURL = require("url:../../img/won.svg");
       }
@@ -35,6 +33,12 @@ export function scoreEl() {
       if (JSON.parse(won) == null) {
         imgURL = require("url:../../img/lost.svg");
       }
+      
+      const owner = this.getAttribute("owner-name")
+      const ownerScore = this.getAttribute("onwer-score");
+      const opponent = this.getAttribute("opponent-name");
+      const opponentScore = this.getAttribute("opponent-score");
+      
 
       rootDiv.innerHTML = `
             <div class="main-score-frame">
@@ -46,8 +50,8 @@ export function scoreEl() {
                   <p class="score-title">Score</p>
 
                   <div class="score-desc">
-                    <p>Vos: ${playerScore}</p>
-                    <p>Maquina: ${computerScore}</p>    
+                    <p>${owner}: ${ownerScore}</p>
+                    <p>${opponent}: ${opponentScore}</p>    
                   </div>
                 </div>
             </div>           
@@ -75,9 +79,9 @@ export function scoreEl() {
           }
           @media(min-width: 768px){
             .background-star-div{
-              width: 364px;
-              height: 364px;
-              background-size: 364px;
+              width: 300px;
+              height: 300px;
+              background-size: 300px;
             }
           }
           

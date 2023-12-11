@@ -2,6 +2,7 @@
 import "./pages/welcome"
 import "./pages/game-room"
 import "./pages/game"
+import "./pages/results"
 import "./router"
 // Components
 import { playElement } from "./components/jugada";

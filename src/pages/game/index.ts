@@ -1,3 +1,4 @@
+import { Router } from "@vaadin/router";
 import { state } from "../../state";
 
 class PlayPage extends HTMLElement{
@@ -10,8 +11,6 @@ class PlayPage extends HTMLElement{
     const initialDiv = document.createElement("div");
     const style = document.createElement("style");
     const backgroundURL = require("url:../../img/fondo.svg");
-  
-    const initLocalState = state.getState();
   
     initialDiv.innerHTML = `
       <div class="playground-div">
@@ -130,31 +129,27 @@ class PlayPage extends HTMLElement{
       piedraEl?.classList.replace("disabled", "enabled");
       papelEl?.classList.replace("enabled", "disabled");
       tijeraEl?.classList.replace("enabled", "disabled");
+
+      state.setActualPlay("piedra");
+      state.setPlayInRtdb(()=>{console.log("SETEADO EN RTDB - /game")})
+
     });
     papelEl?.addEventListener("click", () => {
       papelEl?.classList.replace("disabled", "enabled");
       piedraEl?.classList.replace("enabled", "disabled");
       tijeraEl?.classList.replace("enabled", "disabled");
+
+      state.setActualPlay("papel");
+      state.setPlayInRtdb(()=>{console.log("SETEADO EN RTDB - /game")})
     });
     tijeraEl?.addEventListener("click", () => {
       tijeraEl?.classList.replace("disabled", "enabled");
       papelEl?.classList.replace("enabled", "disabled");
       piedraEl?.classList.replace("enabled", "disabled");
+
+      state.setActualPlay("tijera");
+      state.setPlayInRtdb(()=>{console.log("SETEADO EN RTDB - /game")})
     });
-  
-    const timeToPlay = setInterval(() => {
-      const tijeraClicked = tijeraEl?.classList.contains("disabled");
-      const papelClicked = papelEl?.classList.contains("disabled");
-      const piedraClicked = piedraEl?.classList.contains("disabled");
-  
-      if (tijeraClicked && papelClicked && piedraClicked) {
-        //Se usa location.reload, ya que si se usa el goTo, entra en bucle.
-        clearInterval(timeToPlay);
-        console.log("NO HAS JUGADO NADA")
-        // location.reload();
-      }
-      clearInterval(timeToPlay);
-    }, 3100);
   
     const showPlay = setInterval(() => {
       const piedraEl = initialDiv.querySelector("#piedra");
@@ -162,39 +157,55 @@ class PlayPage extends HTMLElement{
       const tijeraEl = initialDiv.querySelector("#tijera");
   
       if (piedraEl?.classList.contains("enabled")) {
-        state.setActualPlay("piedra");
         papelEl?.classList.add("off");
         tijeraEl?.classList.add("off");
       }
       if (papelEl?.classList.contains("enabled")) {
-        state.setActualPlay("papel");
         tijeraEl?.classList.add("off");
         piedraEl?.classList.add("off");
       }
       if (tijeraEl?.classList.contains("enabled")) {
-        state.setActualPlay("tijera");
         papelEl?.classList.add("off");
         piedraEl?.classList.add("off");
       }
-  
+      
       clearInterval(showPlay);
     }, 5000);
+    
+    const showOpponentPlay = setInterval(() => {
+      const cs = state.getState();
+
+      var playerOpponent = "";
   
-    // const showComputerPlay = setInterval(() => {
-    //   const cs = state.getState();
+      switch(cs.localPlayerName){
+        case cs.realTimeRoom.participants.owner.nombre:
+            playerOpponent = cs.realTimeRoom.sessionPlays.actual.opponent
+          break
   
-    //   var computerChoice = cs.currentGame.computerPlay;
+        case cs.realTimeRoom.participants.opponent.nombre:
+            playerOpponent = cs.realTimeRoom.sessionPlays.actual.owner
+          break
+      }
+      
   
-    //   const playSelectionEl = `
-    //     <play-selection selection="${computerChoice}" class="on" id="opponent-play"></play-selection>
-    //   `;
+      var playSelectionEl = `
+        <play-selection selection="${playerOpponent}" class="on" id="opponent-play"></play-selection>
+      `;
   
-    //   const computerPlayEl = initialDiv.querySelector(".opponent-play") as HTMLElement;
-    //   computerPlayEl.innerHTML = playSelectionEl;
-  
-    //   clearInterval(showComputerPlay);
-    // }, 5050);
-  
+      const computerPlayEl = initialDiv.querySelector(".opponent-play") as HTMLElement;
+      computerPlayEl.innerHTML = playSelectionEl;
+
+      clearInterval(showOpponentPlay);
+      
+    }, 5350);
+    
+    const goTo = setInterval(()=>{
+      Router.go("/results")
+      
+      clearInterval(goTo)
+
+    }, 7700 );
+    
   
     initialDiv.appendChild(style);
     this.shadow.appendChild(initialDiv);

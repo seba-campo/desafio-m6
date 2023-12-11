@@ -35,10 +35,12 @@ export const state = {
           owner: {
               nombre: "",
               isConnected: true,
+              isReady: undefined
           },
           opponent: {
               nombre: "",
               isConnected: true,
+              isReady: undefined
           }
       },
       sessionPlays: {
@@ -49,9 +51,8 @@ export const state = {
           thisSession: []
       }
     },
-    // history: [{ myPlay: "tijera", computerPlay: "tijera" },{ myPlay: "piedra", computerPlay: "tijera" },{ myPlay: "tijera", computerPlay: "papel" },{ myPlay: "tijera", computerPlay: "papel" }],
     scoreBoard: {
-      localPlayerName : 0,
+      owner: 0,
       opponent: 0
     }
   },
@@ -155,7 +156,7 @@ export const state = {
 
     chatroomRef.on("value", (snapshot) => {
         const rtdbSnap = snapshot.val(); 
-        console.log(rtdbSnap)
+        // console.log(rtdbSnap)
         this.setRealTimeRoomData(rtdbSnap);
     });
 
@@ -170,6 +171,61 @@ export const state = {
 
     callback();
   },
+  setPlayInRtdb(callback){
+    const cs = this.getState();
+    
+    switch(cs.localPlayerName){
+      // OWNER
+      case cs.realTimeRoom.participants.owner.nombre:
+        // /rooms/u0wyUkTdf-Zj/sessionPlays/actual/opponent 
+        const jugadaOwner = cs.realTimeRoom.sessionPlays.actual.owner;
+        const ownerRef = rtdb.ref("/rooms/" + cs.roomData.privateKey +"/sessionPlays/actual/owner");
+        ownerRef.set(jugadaOwner);
+        callback()
+      break
+      // OPPONENT
+      case cs.realTimeRoom.participants.opponent.nombre:
+        const jugadaOpponent = cs.realTimeRoom.sessionPlays.actual.opponent;
+        const opponentRef = rtdb.ref("/rooms/" + cs.roomData.privateKey +"/sessionPlays/actual/opponent");
+        opponentRef.set(jugadaOpponent);
+        callback()
+      break
+    }
+
+  },
+  //SUBIR HISTORIAL AL FIRESTORE
+  updateHistory(callback){
+    // ID de la sala
+    const cs = this.getState(); 
+    const roomId = cs.roomId;
+    const opponentPlay = cs.realTimeRoom.sessionPlays.actual.opponent;
+    const ownerPlay = cs.realTimeRoom.sessionPlays.actual.owner;
+
+    // Este update solo lo hará el OWNER para que no se repita la 
+    // jugada dos veces en la DB.
+    if(cs.localPlayerName == cs.roomData.participants.owner.nombre){
+      fetch(API_URL+"/rooms/history", {
+        method: "post",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          roomId: roomId,
+          play: {
+            owner: ownerPlay,
+            opponent: opponentPlay
+          }         
+        })
+      })
+      .then((res)=>{
+        if(res.status == 200){
+          callback()
+        }
+        else{
+          console.log("Un error ocurrió al guardar la partida")
+        }
+      })
+    }
+    
+  },
 
 
 
@@ -183,10 +239,11 @@ export const state = {
     for(var cb of this.listeners){
       cb(cs);
     }
-    console.log("STATE", newState)
+    console.log("SET STATE", newState)
   },
   setActualPlay(play: Jugada){
     const cs = this.getState();
+    
     switch(cs.localPlayerName){
       case cs.realTimeRoom.participants.owner.nombre:
           cs.realTimeRoom.sessionPlays.actual.owner = play
@@ -203,7 +260,7 @@ export const state = {
     const cs = this.getState();
     cs.realTimeRoom.participants.owner.isReady = false
     cs.realTimeRoom.participants.opponent.isReady = false
-
+    console.log("SET UNREADY STATUS")
     this.setState(cs);
   },
   setPlayerReadyStatus(userName: string){
@@ -280,14 +337,14 @@ export const state = {
       cb(currentState);
     }
   },
-  whoWins(localPlay: Jugada, opponentPlay: Jugada) {
+  whoWins(localPlay, opponentPlay) {
     const cs = this.getState();
 
-    const playerGanoConTijeras = localPlay == "tijera" && opponentPlay == "papel";
-    const playerGanoConPapel = localPlay == "papel" && opponentPlay == "piedra";
-    const playerGanoConPiedra = localPlay == "piedra" && opponentPlay == "tijera";
+    const ownerGanoConTijeras = localPlay == "tijera" && opponentPlay == "papel";
+    const ownerGanoConPapel = localPlay == "papel" && opponentPlay == "piedra";
+    const ownerGanoConPiedra = localPlay == "piedra" && opponentPlay == "tijera";
 
-    const playerWins = [playerGanoConTijeras, playerGanoConPiedra, playerGanoConPapel].includes(
+    const ownerWins = [ownerGanoConTijeras, ownerGanoConPiedra, ownerGanoConPapel].includes(
       true
     );
 
@@ -301,39 +358,19 @@ export const state = {
       opponentGanoPiedra,
     ].includes(true);
 
-    if (playerWins) {
-      cs.scoreBoard.localPlayerName ++
+    if (ownerWins) {
+      cs.scoreBoard.owner ++
       this.setState();
-      return true;
+      return "owner";
     }
     if (opponentWins) {
       cs.scoreBoard.opponent ++
       this.setState();
-      return false;
+      return "opponent";
     }
-    if (!playerWins && !opponentWins) {
-      return null;
+    if (!ownerWins && !opponentWins) {
+      return "empate";
     }
-  },
-  generateComputerPlay() {
-    const posibilities = ["piedra", "papel", "tijera"];
-    const nroRandom = Math.floor(Math.random() * (3 - 0) + 0);
-
-    return posibilities[nroRandom];
-  },
-  initState() {
-    const computerPlay = this.generateComputerPlay();
-
-    const initialState = {
-      currentGame: { myPlay: "undefined", computerPlay: computerPlay },
-      history: [],
-      points: {
-        computer: 0,
-        player: 0,
-      },
-    };
-
-    this.setState(initialState);
   },
   restartScore() {
     const cs = this.getState();

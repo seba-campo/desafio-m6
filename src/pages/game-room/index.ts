@@ -8,16 +8,16 @@ class GameRoom extends HTMLElement{
     this.render();
   }
   connectedCallback(){
-    const currenState = state.getState();
     state.subscribe((currentState)=>{
         const opponentReady = currentState.realTimeRoom.participants.owner.isReady;
         const ownerReady = currentState.realTimeRoom.participants.opponent.isReady;
 
-        if(opponentReady && ownerReady){
+        if(opponentReady && ownerReady && location.pathname == "/game-room"){
           // state.setUnReadyStatus();
-          state.updateRtdb(()=>{
-            Router.go("/game")
-          })
+            state.updateRtdb(()=>{
+              Router.go("/game")
+            })
+          console.log(location.pathname)
         }
     })
   }
@@ -34,10 +34,10 @@ class GameRoom extends HTMLElement{
   const actualPlayer = currentState.localPlayerName;
   var opponent = currentState.opponent;
 
-  if(opponent == undefined || currentState.scoreBoard.opponent == undefined){
-    currentState.scoreBoard.opponent = 0;
-    opponent = "Waiting user..."
-  }
+  // if(opponent == undefined || currentState.scoreBoard.opponent == undefined){
+  //   currentState.scoreBoard.opponent = 0;
+  //   opponent = "Waiting user..."
+  // }
 
 
   initialDiv.innerHTML = `
