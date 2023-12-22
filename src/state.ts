@@ -1,4 +1,5 @@
 import { rtdb } from "./rtdb"
+import * as dotenv from "dotenv"
 
 type Jugada = "piedra" | "papel" | "tijera";
 
@@ -6,8 +7,8 @@ type Game = {
   myPlay: Jugada;
   computerPlay: Jugada;
 };
-
-const API_URL = "http://localhost:3000";
+// "http://localhost:3000"
+const API_URL = process.env.API_URL_M6;
 
 export const state = {
   data: {

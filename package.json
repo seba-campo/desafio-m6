@@ -1,17 +1,17 @@
 {
   "name": "desafio-m6",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "dependencies": {
     "@vaadin/router": "^1.7.5",
+    "dotenv": "^16.3.1",
     "firebase": "8.7.1",
     "gh-pages": "^6.0.0",
     "parcel": "^2.9.3"
   },
   "scripts": {
     "dev": "parcel serve ./src/index.html --port 8080",
-    "build": "parcel build ./src/index.html --dist-dir build --public-url https://seba-campo.github.io/desafio-m5/",
+    "build": "parcel build ./src/index.html --dist-dir build --public-url https://seba-campo.github.io/desafio-m6/",
     "deploy": "gh-pages -d build"
   },
   "devDependencies": {
