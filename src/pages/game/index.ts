@@ -7,6 +7,15 @@ class PlayPage extends HTMLElement{
     super();
     this.render();
   }
+  connectedCallback(){
+    const goToResults = setInterval(()=>{
+      console.log("yendo a results")
+      Router.go("/results")
+
+      clearInterval(goToResults)
+
+    }, 7500 );
+  }
   render(){
     const initialDiv = document.createElement("div");
     const style = document.createElement("style");
@@ -173,6 +182,8 @@ class PlayPage extends HTMLElement{
     }, 5000);
     
     const showOpponentPlay = setInterval(() => {
+      
+
       const cs = state.getState();
 
       var playerOpponent = "";
@@ -195,17 +206,11 @@ class PlayPage extends HTMLElement{
       const computerPlayEl = initialDiv.querySelector(".opponent-play") as HTMLElement;
       computerPlayEl.innerHTML = playSelectionEl;
 
+      
+
       clearInterval(showOpponentPlay);
       
-    }, 5350);
-    
-    const goTo = setInterval(()=>{
-      Router.go("/results")
-      
-      clearInterval(goTo)
-
-    }, 7700 );
-    
+    }, 5350);   
   
     initialDiv.appendChild(style);
     this.shadow.appendChild(initialDiv);

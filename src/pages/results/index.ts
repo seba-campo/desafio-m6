@@ -5,7 +5,9 @@ class Results extends HTMLElement{
   shadow = this.attachShadow({mode: "open"})
   constructor(){
     super();
-    this.render();
+    this.render(); 
+  }
+  connectedCallback(){
     
   }
   render(){
@@ -13,16 +15,16 @@ class Results extends HTMLElement{
     const style = document.createElement("style");
   
     const backgroundURL = require("url:../../img/fondo.svg");
-  
+
     const currentState = state.getState();
+    console.log("STATE DEL RESULTS " + JSON.stringify(currentState))
   
-    
     var lastOpponentPlay = "";
     var lastPlayerPlay = "";
     // const history = currentState.history;
 
-    const ownerName = currentState.realTimeRoom.participants.owner.nombre;
-    const opponentName = currentState.realTimeRoom.participants.opponent.nombre;
+    const ownerName = currentState.roomData.participants.owner.nombre;
+    const opponentName = currentState.roomData.participants.opponent.nombre;
     
 
     var localWin : boolean|null = false;
@@ -38,9 +40,9 @@ class Results extends HTMLElement{
       case currentState.realTimeRoom.participants.opponent.nombre:
           lastOpponentPlay = currentState.realTimeRoom.sessionPlays.actual.owner
           lastPlayerPlay = currentState.realTimeRoom.sessionPlays.actual.opponent
-
         break
     }
+
     const whoWin = state.whoWins(lastPlayerPlay, lastOpponentPlay);
     var backgroundColor = "rgba(137, 73, 73, 0.9)";
     
@@ -64,15 +66,7 @@ class Results extends HTMLElement{
     if(whoWin == "empate"){
         localWin = null
     }
-
-    // var opponentScore = 0;
-    // var ownerScore = 0;
-    
   
-    
-    // console.log("GANO = " + whoWin)
-        
- 
     initialDiv.innerHTML = `
         <div class="main-wrapper">
           <div class="score-div">
@@ -163,10 +157,20 @@ class Results extends HTMLElement{
         display: none;
       }
     `;
+
+    
   
     const buttonReplay = initialDiv.querySelector(".button-replay");
     buttonReplay?.addEventListener("click", () => {
-      Router.go("/game-room")
+      state.setUnReadyStatus();
+      state.updateRtdb(()=>{
+        console.log("UPDATE RTDB RESULTS")
+        state.updateHistory(()=>{
+          console.log("Historial actualizado")
+          Router.go("/game-room")
+          })
+      });
+      
     });
   
     const buttonExit = initialDiv.querySelector(".button-exit");
@@ -174,14 +178,6 @@ class Results extends HTMLElement{
       Router.go("/")
     });
 
-    state.setUnReadyStatus();
-    state.updateRtdb(()=>{
-      console.log("UPDATE RTDB RESULTS")
-    });
-    state.updateHistory(()=>{
-      console.log("Historial actualizado")
-    })
-  
     initialDiv.appendChild(style);
     this.shadow.appendChild(initialDiv)
   
@@ -189,4 +185,4 @@ class Results extends HTMLElement{
   }
 }
 
-customElements.define("results-page", Results);
+customElements.define("results-page2", Results);

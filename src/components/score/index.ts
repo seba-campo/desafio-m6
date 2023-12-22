@@ -33,30 +33,17 @@ export function scoreEl() {
       if (JSON.parse(won) == null) {
         imgURL = require("url:../../img/lost.svg");
       }
-      
-      const owner = this.getAttribute("owner-name")
-      const ownerScore = this.getAttribute("onwer-score");
-      const opponent = this.getAttribute("opponent-name");
-      const opponentScore = this.getAttribute("opponent-score");
-      
+            
 
       rootDiv.innerHTML = `
             <div class="main-score-frame">
-                <div class="background-star-div">
-                  <h1 class="result">${resultString}</h1>
-                </div>
-
-                <div class="score-box">
-                  <p class="score-title">Score</p>
-
-                  <div class="score-desc">
-                    <p>${owner}: ${ownerScore}</p>
-                    <p>${opponent}: ${opponentScore}</p>    
-                  </div>
-                </div>
+              <div class="background-star-div">
+                <h1 class="result">${resultString}</h1>
+              </div>
             </div>           
         `;
 
+                
       style.textContent = `
           .main-score-frame{
             display:flex;

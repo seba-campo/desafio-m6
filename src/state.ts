@@ -35,12 +35,12 @@ export const state = {
           owner: {
               nombre: "",
               isConnected: true,
-              isReady: undefined
+              isReady: "null"
           },
           opponent: {
               nombre: "",
               isConnected: true,
-              isReady: undefined
+              isReady: "null"
           }
       },
       sessionPlays: {
@@ -156,7 +156,7 @@ export const state = {
 
     chatroomRef.on("value", (snapshot) => {
         const rtdbSnap = snapshot.val(); 
-        // console.log(rtdbSnap)
+        // console.log("rtdb snap", rtdbSnap)
         this.setRealTimeRoomData(rtdbSnap);
     });
 
@@ -197,6 +197,7 @@ export const state = {
   updateHistory(callback){
     // ID de la sala
     const cs = this.getState(); 
+    // console.log("UPDATE HISTORY CURRENT STATE", cs)
     const roomId = cs.roomId;
     const opponentPlay = cs.realTimeRoom.sessionPlays.actual.opponent;
     const ownerPlay = cs.realTimeRoom.sessionPlays.actual.owner;
@@ -233,13 +234,16 @@ export const state = {
   getState() {
     return this.data;
   },
-  setState(newState) {
+  setState(newState, opt: string = "a") {
     const cs = this.getState();
     this.data = newState;
     for(var cb of this.listeners){
       cb(cs);
     }
-    console.log("SET STATE", newState)
+
+    if(opt.length > 1){
+      console.log("SET STATE", opt)
+    }
   },
   setActualPlay(play: Jugada){
     const cs = this.getState();
@@ -260,7 +264,6 @@ export const state = {
     const cs = this.getState();
     cs.realTimeRoom.participants.owner.isReady = false
     cs.realTimeRoom.participants.opponent.isReady = false
-    console.log("SET UNREADY STATUS")
     this.setState(cs);
   },
   setPlayerReadyStatus(userName: string){
@@ -268,12 +271,12 @@ export const state = {
     switch(userName){
       case cs.realTimeRoom.participants.owner.nombre:
           cs.realTimeRoom.participants.owner.isReady = true
-          this.setState(cs);
+          this.setState(cs, "unready");
         break
 
       case cs.realTimeRoom.participants.opponent.nombre:
           cs.realTimeRoom.participants.opponent.isReady = true
-          this.setState(cs);
+          this.setState(cs, "unready");
         break
       }
   },
@@ -360,12 +363,10 @@ export const state = {
 
     if (ownerWins) {
       cs.scoreBoard.owner ++
-      this.setState();
       return "owner";
     }
     if (opponentWins) {
       cs.scoreBoard.opponent ++
-      this.setState();
       return "opponent";
     }
     if (!ownerWins && !opponentWins) {
@@ -379,4 +380,54 @@ export const state = {
 
     this.setState(cs);
   },
+  resetState(){
+    const newState = {
+      localPlayerName: "",
+      localPlayerId: "",
+      opponent: "",
+      roomId: "",
+      roomData: {
+        privateKey: "",
+        participants: {
+          owner:{
+            nombre: "",
+            id: "",
+          },
+          opponent:{
+            nombre: "",
+            id: "",
+          }
+        },
+        isFull: Boolean,
+      },
+      realTimeRoom: {
+        owner: "",
+        participants: {
+            owner: {
+                nombre: "",
+                isConnected: true,
+                isReady: "null"
+            },
+            opponent: {
+                nombre: "",
+                isConnected: true,
+                isReady: "null"
+            }
+        },
+        sessionPlays: {
+            actual: {
+              owner: "",
+              opponent: "",
+            },
+            thisSession: []
+        }
+      },
+      scoreBoard: {
+        owner: 0,
+        opponent: 0
+      }
+    }
+
+    this.data = newState;
+  }
 };

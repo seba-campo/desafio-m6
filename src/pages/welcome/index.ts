@@ -7,6 +7,7 @@ class Welcome extends HTMLElement{
   constructor(){
     super();
     this.render();
+    state.resetState()
   }  
   render(){
     const div = document.createElement("div");
@@ -175,26 +176,28 @@ class Welcome extends HTMLElement{
         console.log("Asignado el nombre ", nameInput.value);
         state.setNombre(nameInput.value);
 
+        state.login(()=>{
+          console.log("User logged in...")
+          // Creo la sala
+          state.createRoom(()=>{
+            console.log("Room created")
+            // Me conecto a la sala
+            state.connectToRoom(()=>{
+              console.log("Connected to Room")
+              // Arranco la RTDB
+              state.sablishRoomConnection(()=>{
+                console.log("Room started")
+                Router.go("/game-room")
+              })
+            })
+          });
+        });
+
       }else{
         alert("Nombre inválido, o de menos de 4 caracteres");
       }
-      // TODO fetch user y crear sala
-      state.login(()=>{
-        console.log("User logged in...")
-        // Creo la sala
-        state.createRoom(()=>{
-          console.log("Room created")
-          // Me conecto a la sala
-          state.connectToRoom(()=>{
-            console.log("Connected to Room")
-            // Arranco la RTDB
-            state.sablishRoomConnection(()=>{
-              console.log("Room started")
-              Router.go("/game-room")
-            })
-          })
-        });
-      });
+      //
+      
     });
 
 
