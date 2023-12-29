@@ -167,11 +167,21 @@ class Results extends HTMLElement{
         state.setUnReadyStatus();
         state.updateRtdb(()=>{
           console.log("Setted unready status")
-          Router.go("/game-room");
+          if(cs.deployed){
+            Router.go("/desafio-m6/game-room");
+          }
+          if(!cs.deployed){
+            Router.go("/game-room");
+          }
         })
       }
       else{
-        Router.go("/game-room");
+        if(cs.deployed){
+          Router.go("/desafio-m6/game-room");
+        }
+        if(!cs.deployed){
+          Router.go("/game-room");
+        }
       }
       
     })

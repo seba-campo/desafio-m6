@@ -12,6 +12,7 @@ const API_URL = process.env.API_URL_M6;
 
 export const state = {
   data: {
+    deployed: false,
     localPlayerName: "",
     localPlayerId: "",
     opponent: "",
@@ -232,6 +233,12 @@ export const state = {
 
 
   // METODOS GET/SET
+  setDeployedStatus(status : boolean){
+    const cs = this.getState();
+    cs.deployed = status
+
+    this.setState(cs)
+  },
   getState() {
     return this.data;
   },

@@ -14,10 +14,15 @@ class GameRoom extends HTMLElement{
 
         if(opponentReady && ownerReady && location.pathname == "/game-room"){
           // state.setUnReadyStatus();
+            
             state.updateRtdb(()=>{
-              Router.go("/game")
+              if(currentState.deployed){
+                Router.go("/desafio-m6/game")
+              }
+              if(!currentState.deployed){
+                Router.go("/game")
+              }
             })
-          console.log(location.pathname)
         }
     })
   }

@@ -175,6 +175,7 @@ class Welcome extends HTMLElement{
       if(nameInput.value.length >= 4){
         console.log("Asignado el nombre ", nameInput.value);
         state.setNombre(nameInput.value);
+        const cs = state.getState()
 
         state.login(()=>{
           console.log("User logged in...")
@@ -187,7 +188,12 @@ class Welcome extends HTMLElement{
               // Arranco la RTDB
               state.sablishRoomConnection(()=>{
                 console.log("Room started")
-                Router.go("/game-room")
+                if(cs.deployed){
+                  Router.go("/desafio-m6/game-room");
+                }
+                if(!cs.deployed){
+                  Router.go("/game-room");
+                }
               })
             })
           });
@@ -238,7 +244,13 @@ class Welcome extends HTMLElement{
               // Arranco la RTDB
               state.sablishRoomConnection(()=>{
                 console.log("Room started")
-                Router.go("/game-room")
+                const cs = state.getState();
+                if(cs.deployed){
+                  Router.go("/desafio-m6/game-room");
+                }
+                if(!cs.deployed){
+                  Router.go("/game-room");
+                }
               })
             })
           })

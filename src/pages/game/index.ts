@@ -10,7 +10,13 @@ class PlayPage extends HTMLElement{
   connectedCallback(){
     const goToResults = setInterval(()=>{
       console.log("yendo a results")
-      Router.go("/results")
+      const cs = state.getState()
+      if(cs.deployed){
+        Router.go("/desafio-m6/results")
+      }
+      if(!cs.deployed){
+        Router.go("/results")
+      }
 
       clearInterval(goToResults)
 

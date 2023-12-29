@@ -166,8 +166,14 @@ class Results extends HTMLElement{
       state.updateRtdb(()=>{
         console.log("UPDATE RTDB RESULTS")
         state.updateHistory(()=>{
-          console.log("Historial actualizado")
-          Router.go("/game-room")
+          const cs = state.getState();
+
+          if(cs.deployed){
+            Router.go("/desafio-m6/game-room")
+          }
+          if(!cs.deployed){
+            Router.go("/game-room")
+          }
           })
       });
       
@@ -175,7 +181,14 @@ class Results extends HTMLElement{
   
     const buttonExit = initialDiv.querySelector(".button-exit");
     buttonExit?.addEventListener("click", () => {
-      Router.go("/")
+      const cs = state.getState();
+
+      if(cs.deployed){
+        Router.go("/desafio-m6/")
+      }
+      if(!cs.deployed){
+        Router.go("/")
+      }
     });
 
     initialDiv.appendChild(style);
